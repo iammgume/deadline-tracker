@@ -1,0 +1,238 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #222222;
+    margin: 0;
+    padding: 40px 20px;
+}
+
+main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 12px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+main > p {
+    text-align: center;
+    color: #666666;
+    margin-bottom: 30px;
+}
+
+section {
+    margin-top: 25px;
+}
+
+#timer-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="number"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+}
+
+button {
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#start-button {
+    background-color: #17e064;
+    color: #102416;
+}
+
+#stop-button {
+    background-color: #d93636;
+    color: #ffffff;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+button:not(:disabled):hover {
+    opacity: 0.85;
+}
+
+#timer-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background-color: #f4f6f8;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#timer-status {
+    margin: 0;
+}
+
+.progress-ring {
+    width: 260px;
+    height: 260px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: conic-gradient(
+        #17e064 0%,
+        #e5e7eb 0%
+    );
+}
+
+.progress-ring-inner {
+    width: 220px;
+    height: 220px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #ffffff;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+/* The inner overtime ring */
+.overtime-ring {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 0;
+
+    background: conic-gradient(
+        #f59e0b 0%,
+        #e5e7eb 0%
+    );
+
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 12px),
+        #000 calc(100% - 11px)
+    );
+
+    mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 12px),
+        #000 calc(100% - 11px)
+    );
+
+    transition: opacity 0.3s ease;
+}
+
+.overtime-ring.active {
+    opacity: 1;
+}
+
+#time-display,
+#ring-percentage,
+#overtime-ring-percentage,
+#mode-switch-button {
+    position: relative;
+    z-index: 1;
+}
+
+#time-display {
+    margin: 0;
+    font-size: 25px;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+}
+
+#ring-percentage {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#overtime-ring-percentage {
+    font-size: 11px;
+    color: #92400e;
+}
+
+#mode-switch-button {
+    max-width: 100%;
+    padding: 8px 10px;
+    background-color: #e5e7eb;
+    color: #222222;
+    font-size: 12px;
+    border-radius: 999px;
+}
+
+#progress-text {
+    margin: 0;
+    color: #666666;
+}
+
+#timer-summary {
+    padding: 20px;
+    background-color: #f4f6f8;
+    border-radius: 10px;
+}
+
+#timer-summary[hidden],
+#overtime-ring-percentage[hidden],
+#overtime-percentage[hidden] {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 20px 12px;
+    }
+
+    main {
+        padding: 20px 14px;
+    }
+
+    .progress-ring {
+        width: 240px;
+        height: 240px;
+    }
+
+    .progress-ring-inner {
+        width: 200px;
+        height: 200px;
+    }
+
+    .overtime-ring {
+        width: 174px;
+        height: 174px;
+    }
+
+    #time-display {
+        font-size: 22px;
+    }
+}

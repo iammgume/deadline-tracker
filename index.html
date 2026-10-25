@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadline Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.webmanifest">
+        <script src="script.js" defer></script>
+</head>
+<body>
+    <main>
+        <h1>Deadline Tracker</h1>
+        <p>Set a target duration and track your time.</p>
+
+        <section id="timer-setup">
+            <label for="duration-hours">
+                Target duration (hours)
+            </label>
+
+            <input
+                type="number"
+                id="duration-hours"
+                min="0.001"
+                step="any"
+                value="1"
+            >
+
+            <button id="start-button" type="button">
+                Start Timer
+            </button>
+
+            <button id="stop-button" type="button" disabled>
+                Stop Timer
+            </button>
+        </section>
+
+        <section id="timer-display">
+            <h2 id="timer-status">Ready to start</h2>
+
+            <div
+                id="progress-bar"
+                class="progress-ring"
+                role="progressbar"
+                aria-label="Target time progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+            >
+                <div class="progress-ring-inner">
+
+                    <div
+                        id="overtime-ring"
+                        class="overtime-ring"
+                        aria-hidden="true"
+                    ></div>
+
+                    <p id="time-display">00:00:00</p>
+
+                    <span id="ring-percentage">0%</span>
+
+                    <span id="overtime-ring-percentage" hidden>
+                        Overtime cycle: 0%
+                    </span>
+
+                    <button
+                        id="mode-switch-button"
+                        type="button"
+                        disabled
+                    >
+                        Switch to time remaining
+                    </button>
+                </div>
+            </div>
+
+            <p id="progress-text">Target progress: 0%</p>
+        </section>
+
+        <section id="timer-summary" hidden>
+            <h2>Timer Summary</h2>
+
+            <p id="target-duration"></p>
+            <p id="actual-elapsed"></p>
+            <p id="final-progress"></p>
+            <p id="final-result"></p>
+            <p id="overtime-percentage" hidden></p>
+        </section>
+    </main>
+</body>
+</html>
