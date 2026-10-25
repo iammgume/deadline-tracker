@@ -1,61 +1,173 @@
 
+:root {
+    color-scheme: light;
+
+    --page-background: #f3f4f6;
+    --surface-background: #ffffff;
+    --text-color: #1f2937;
+    --secondary-text: #6b7280;
+    --border-color: #d1d5db;
+    --ring-track: #e5e7eb;
+    --summary-background: #f9fafb;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --page-background: #f3f4f6;
+    --surface-background: #ffffff;
+    --text-color: #1f2937;
+    --secondary-text: #6b7280;
+    --border-color: #d1d5db;
+    --ring-track: #e5e7eb;
+    --summary-background: #f9fafb;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --page-background: #111827;
+    --surface-background: #1f2937;
+    --text-color: #f9fafb;
+    --secondary-text: #d1d5db;
+    --border-color: #4b5563;
+    --ring-track: #374151;
+    --summary-background: #273449;
+}
+
+/* Follow the operating system unless the user selects a theme. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        color-scheme: dark;
+
+        --page-background: #111827;
+        --surface-background: #1f2937;
+        --text-color: #f9fafb;
+        --secondary-text: #d1d5db;
+        --border-color: #4b5563;
+        --ring-track: #374151;
+        --summary-background: #273449;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
-    color: #222222;
     margin: 0;
-    padding: 40px 20px;
+    min-height: 100vh;
+    padding: 24px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    background-color: var(--page-background);
+    color: var(--text-color);
+
+    font-family: Arial, sans-serif;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 }
 
 main {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 12px;
+    width: 100%;
+    max-width: 520px;
+    padding: 24px;
+
+    background-color: var(--surface-background);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+
+    box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
 }
 
 h1 {
+    margin-top: 0;
+    margin-bottom: 8px;
     text-align: center;
-    margin-bottom: 10px;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+p {
+    color: var(--secondary-text);
+    line-height: 1.5;
 }
 
 main > p {
     text-align: center;
-    color: #666666;
-    margin-bottom: 30px;
 }
 
-section {
-    margin-top: 25px;
+/* Theme selector */
+#theme-toggle-button {
+    display: block;
+    margin-left: auto;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+
+    background-color: var(--surface-background);
+    color: var(--text-color);
+
+    font-size: 13px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+
+    cursor: pointer;
 }
 
+#theme-toggle-button:hover {
+    opacity: 0.8;
+}
+
+/* Timer setup */
 #timer-setup {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-top: 24px;
+    margin-bottom: 32px;
 }
 
-label {
+#timer-setup label {
     font-weight: bold;
 }
 
-input[type="number"] {
+#duration-hours {
     width: 100%;
-    box-sizing: border-box;
     padding: 12px;
+
+    background-color: var(--surface-background);
+    color: var(--text-color);
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     font-size: 16px;
-    border: 1px solid #cccccc;
-    border-radius: 6px;
 }
 
 button {
-    padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
+    padding: 12px 16px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+
+    font-size: 15px;
+    font-weight: bold;
+
     cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 #start-button {
@@ -68,171 +180,188 @@ button {
     color: #ffffff;
 }
 
-button:disabled {
-    background-color: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-}
-
-button:not(:disabled):hover {
-    opacity: 0.85;
-}
-
+/* Timer display */
 #timer-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 20px;
-    background-color: #f4f6f8;
-    border-radius: 10px;
     text-align: center;
 }
 
 #timer-status {
-    margin: 0;
+    margin-bottom: 20px;
+    overflow-wrap: anywhere;
 }
 
+/* Main circular progress ring */
 .progress-ring {
-    width: 260px;
-    height: 260px;
-    flex-shrink: 0;
-    border-radius: 50%;
+    --target-progress: 0%;
+
+    position: relative;
+    width: 280px;
+    height: 280px;
+    max-width: 100%;
+
+    margin: 0 auto 20px;
+    padding: 12px;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
+    border-radius: 50%;
+
     background: conic-gradient(
         #17e064 0%,
-        #e5e7eb 0%
+        #17e064 var(--target-progress),
+        var(--ring-track) var(--target-progress),
+        var(--ring-track) 100%
     );
 }
 
+/* Inner circle */
 .progress-ring-inner {
-    width: 220px;
-    height: 220px;
-    box-sizing: border-box;
-    border-radius: 50%;
-    background-color: #ffffff;
-
     position: relative;
+    width: 100%;
+    height: 100%;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+
+    overflow: hidden;
+    border-radius: 50%;
+
+    background-color: var(--surface-background);
 }
 
-/* The inner overtime ring */
+/* Overtime ring */
 .overtime-ring {
+    --overtime-progress: 0%;
+
     position: absolute;
-    width: 190px;
-    height: 190px;
+    inset: 8px;
+
     border-radius: 50%;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 0;
 
     background: conic-gradient(
         #f59e0b 0%,
-        #e5e7eb 0%
+        #f59e0b var(--overtime-progress),
+        transparent var(--overtime-progress),
+        transparent 100%
     );
 
     -webkit-mask: radial-gradient(
         farthest-side,
-        transparent calc(100% - 12px),
-        #000 calc(100% - 11px)
+        transparent calc(100% - 5px),
+        #000 calc(100% - 4px)
     );
 
     mask: radial-gradient(
         farthest-side,
-        transparent calc(100% - 12px),
-        #000 calc(100% - 11px)
+        transparent calc(100% - 5px),
+        #000 calc(100% - 4px)
     );
 
-    transition: opacity 0.3s ease;
-}
-
-.overtime-ring.active {
-    opacity: 1;
-}
-
-#time-display,
-#ring-percentage,
-#overtime-ring-percentage,
-#mode-switch-button {
-    position: relative;
-    z-index: 1;
+    pointer-events: none;
 }
 
 #time-display {
+    position: relative;
+    z-index: 1;
+
     margin: 0;
-    font-size: 25px;
+    color: var(--text-color);
+
+    font-size: clamp(24px, 6vw, 32px);
     font-weight: bold;
     font-variant-numeric: tabular-nums;
 }
 
 #ring-percentage {
-    font-size: 24px;
-    font-weight: bold;
+    position: relative;
+    z-index: 1;
+
+    margin-top: 8px;
+    color: var(--secondary-text);
+
+    font-size: 16px;
 }
 
 #overtime-ring-percentage {
-    font-size: 11px;
-    color: #92400e;
-}
+    position: relative;
+    z-index: 1;
 
-#mode-switch-button {
-    max-width: 100%;
-    padding: 8px 10px;
-    background-color: #e5e7eb;
-    color: #222222;
+    margin-top: 6px;
+    color: #d97706;
+
     font-size: 12px;
+    font-weight: bold;
+}
+
+/* Elapsed / remaining switch */
+#mode-switch-button {
+    position: relative;
+    z-index: 2;
+
+    margin-top: 14px;
+    padding: 8px 10px;
+
+    background-color: var(--summary-background);
+    color: var(--text-color);
+
+    border: 1px solid var(--border-color);
     border-radius: 999px;
+
+    font-size: 12px;
 }
 
+/* Progress text below the ring */
 #progress-text {
-    margin: 0;
-    color: #666666;
+    margin-bottom: 0;
 }
 
+/* Timer summary */
 #timer-summary {
+    margin-top: 32px;
     padding: 20px;
-    background-color: #f4f6f8;
-    border-radius: 10px;
+
+    background-color: var(--summary-background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
 }
 
-#timer-summary[hidden],
-#overtime-ring-percentage[hidden],
-#overtime-percentage[hidden] {
-    display: none;
+#timer-summary h2 {
+    text-align: center;
 }
 
+#timer-summary p {
+    overflow-wrap: anywhere;
+}
+
+#final-result {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+/* Keyboard accessibility */
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #60a5fa;
+    outline-offset: 3px;
+}
+
+/* Smaller screens */
 @media (max-width: 480px) {
     body {
-        padding: 20px 12px;
+        padding: 12px;
     }
 
     main {
-        padding: 20px 14px;
+        padding: 18px;
     }
 
     .progress-ring {
-        width: 240px;
-        height: 240px;
-    }
-
-    .progress-ring-inner {
-        width: 200px;
-        height: 200px;
-    }
-
-    .overtime-ring {
-        width: 174px;
-        height: 174px;
-    }
-
-    #time-display {
-        font-size: 22px;
+        width: min(280px, 100%);
+        height: auto;
+        aspect-ratio: 1;
     }
 }

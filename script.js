@@ -25,6 +25,8 @@ const overtimePercentageText = document.getElementById(
     "overtime-percentage"
 );
 
+const themeToggleButton = document.getElementById("theme-toggle-button");
+
 let targetDuration = 0;
 let startTime = 0;
 let elapsedSeconds = 0;
@@ -32,6 +34,86 @@ let timerInterval = null;
 let isRunning = false;
 let displayMode = "elapsed";
 
+
+/*
+ * THEME SETTINGS
+ *
+ * On first use, follow the operating system's theme.
+ * The user can toggle directly between Light and Dark.
+ * Manual choices are remembered on the device.
+ */
+
+const themeStorageKey = "deadline-tracker-theme";
+
+function getSavedTheme() {
+    try {
+        const savedTheme = localStorage.getItem(themeStorageKey);
+
+        if (savedTheme === "light" || savedTheme === "dark") {
+            return savedTheme;
+        }
+    } catch (error) {
+        console.warn("Could not read the saved theme:", error);
+    }
+
+    return "system";
+}
+
+let themePreference = getSavedTheme();
+
+function applyTheme() {
+    const root = document.documentElement;
+
+    if (themePreference === "system") {
+        root.removeAttribute("data-theme");
+    } else {
+        root.setAttribute("data-theme", themePreference);
+    }
+
+    themeToggleButton.textContent =
+        themePreference === "dark"
+            ? "Switch to Light"
+            : "Switch to Dark";
+
+    themeToggleButton.setAttribute(
+        "aria-label",
+        themeToggleButton.textContent
+    );
+
+    try {
+        if (themePreference === "system") {
+            localStorage.removeItem(themeStorageKey);
+        } else {
+            localStorage.setItem(themeStorageKey, themePreference);
+        }
+    } catch (error) {
+        console.warn("Could not save the theme preference:", error);
+    }
+}
+
+function switchTheme() {
+    if (themePreference === "system") {
+        const systemPrefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+        ).matches;
+
+        themePreference = systemPrefersDark ? "light" : "dark";
+    } else {
+        themePreference =
+            themePreference === "light" ? "dark" : "light";
+    }
+
+    applyTheme();
+}
+
+themeToggleButton.addEventListener("click", switchTheme);
+
+applyTheme();
+
+
+/*
+ * FORMAT TIME
+ */
 
 function formatTime(totalSeconds) {
     const safeSeconds = Math.max(0, Math.floor(totalSeconds));
@@ -47,6 +129,10 @@ function formatTime(totalSeconds) {
     ].join(":");
 }
 
+
+/*
+ * UPDATE TIMER DISPLAY
+ */
 
 function updateTimer() {
     elapsedSeconds = (Date.now() - startTime) / 1000;
@@ -64,11 +150,15 @@ function updateTimer() {
     );
 
     /*
-     * The outer ring represents target progress.
+     * Outer ring: target progress.
+     * The unfilled section follows the active theme.
      */
+
     progressRing.style.background = `conic-gradient(
+        #17e064 0%,
         #17e064 ${targetProgress}%,
-        #e5e7eb ${targetProgress}%
+        var(--ring-track) ${targetProgress}%,
+        var(--ring-track) 100%
     )`;
 
     ringPercentage.textContent =
@@ -80,10 +170,11 @@ function updateTimer() {
     );
 
     /*
-     * The inner ring appears once the target is reached.
+     * Inner ring: overtime progress.
      * Each complete cycle represents one target-duration
      * interval of overtime.
      */
+
     if (overtimeSeconds > 0) {
         const overtimeCycleProgress =
             ((overtimeSeconds % targetDuration) / targetDuration) * 100;
@@ -91,11 +182,14 @@ function updateTimer() {
         overtimeRing.classList.add("active");
 
         overtimeRing.style.background = `conic-gradient(
+            #f59e0b 0%,
             #f59e0b ${overtimeCycleProgress}%,
-            #e5e7eb ${overtimeCycleProgress}%
+            var(--ring-track) ${overtimeCycleProgress}%,
+            var(--ring-track) 100%
         )`;
 
         overtimeRingPercentage.hidden = false;
+
         overtimeRingPercentage.textContent =
             `Overtime cycle: ${Math.floor(overtimeCycleProgress)}%`;
     } else {
@@ -104,8 +198,9 @@ function updateTimer() {
     }
 
     /*
-     * The central timer can show elapsed or remaining time.
+     * Central timer: elapsed or remaining time.
      */
+
     if (displayMode === "elapsed") {
         timeDisplay.textContent = formatTime(elapsedSeconds);
 
@@ -121,8 +216,9 @@ function updateTimer() {
     }
 
     /*
-     * Update the status beneath the ring.
+     * Status beneath the ring.
      */
+
     if (remainingSeconds > 0) {
         timerStatus.textContent = "Time remaining";
 
@@ -136,6 +232,10 @@ function updateTimer() {
     }
 }
 
+
+/*
+ * START TIMER
+ */
 
 function startTimer() {
     const hours = Number(durationInput.value);
@@ -170,14 +270,15 @@ function startTimer() {
 }
 
 
+/*
+ * STOP TIMER AND DISPLAY SUMMARY
+ */
+
 function stopTimer() {
     if (!isRunning) {
         return;
     }
 
-    /*
-     * Take the final time measurement before stopping.
-     */
     updateTimer();
 
     clearInterval(timerInterval);
@@ -208,6 +309,7 @@ function stopTimer() {
     /*
      * Fill in the summary.
      */
+
     targetDurationText.textContent =
         `Target duration: ${formatTime(targetDuration)}`;
 
@@ -238,6 +340,10 @@ function stopTimer() {
 }
 
 
+/*
+ * SWITCH BETWEEN ELAPSED AND REMAINING TIME
+ */
+
 function switchDisplayMode() {
     displayMode = displayMode === "elapsed"
         ? "remaining"
@@ -249,29 +355,43 @@ function switchDisplayMode() {
     }
 
     /*
-     * Allow the user to switch the display after stopping,
-     * without restarting or changing the recorded duration.
+     * Switching the display after stopping does not
+     * restart the timer or change the recorded duration.
      */
+
     const remainingSeconds = targetDuration - elapsedSeconds;
     const overtimeSeconds = Math.max(0, -remainingSeconds);
 
     if (displayMode === "elapsed") {
         timeDisplay.textContent = formatTime(elapsedSeconds);
-        modeSwitchButton.textContent = "Switch to time remaining";
+
+        modeSwitchButton.textContent =
+            "Switch to time remaining";
     } else {
         timeDisplay.textContent = remainingSeconds > 0
             ? formatTime(remainingSeconds)
             : `+${formatTime(overtimeSeconds)}`;
 
-        modeSwitchButton.textContent = "Switch to time elapsed";
+        modeSwitchButton.textContent =
+            "Switch to time elapsed";
     }
 }
 
+
+/*
+ * EVENT LISTENERS
+ */
 
 startButton.addEventListener("click", startTimer);
 stopButton.addEventListener("click", stopTimer);
 modeSwitchButton.addEventListener("click", switchDisplayMode);
 
+
+/*
+ * SERVICE WORKER
+ *
+ * Preserves the existing offline functionality.
+ */
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

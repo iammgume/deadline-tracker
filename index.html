@@ -4,14 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Deadline Tracker</title>
+
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.webmanifest">
-        <script src="script.js" defer></script>
+
+    <script src="script.js" defer></script>
 </head>
 <body>
     <main>
+        <button
+            id="theme-toggle-button"
+            type="button"
+            aria-label="Change colour theme"
+        >
+            Theme: System
+        </button>
+
         <h1>Deadline Tracker</h1>
+
         <p>Set a target duration and track your time.</p>
 
         <section id="timer-setup">
